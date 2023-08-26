@@ -12,7 +12,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/bazelbuild/bazelisk/httputil"
 	"github.com/codeclysm/extract/v3"
 )
 
@@ -72,7 +71,7 @@ func (a *HTTPArchive) Install(dst string) (string, error) {
 	if err != nil {
 		return installed, err
 	}
-	data, _, err := httputil.ReadRemoteFile(source, "")
+	data, _, err := readRemoteFile(source)
 	if err != nil {
 		return installed, err
 	}

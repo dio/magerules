@@ -11,14 +11,14 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-func Create(name string, build func(string, string, string) error) error {
+func Create(name, versionPkg string, build func(string, string, string, string) error) error {
 	var archives []string
 	x := target.Name(name)
 	for _, goos := range []string{"linux", "darwin"} {
 		goos := goos
 		for _, goarch := range []string{"arm64", "amd64"} {
 			goarch := goarch
-			err := build(name, goos, goarch)
+			err := build(name, goos, goarch, versionPkg)
 			if err != nil {
 				return err
 			}

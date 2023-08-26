@@ -8,11 +8,13 @@ import (
 	"encoding/hex"
 	"fmt"
 	"html/template"
+	"io"
+	"net/http"
+	"os"
 	"path"
 	"runtime"
 	"strings"
 
-	"github.com/bazelbuild/bazelisk/httputil"
 	"github.com/codeclysm/extract/v3"
 )
 
@@ -72,7 +74,7 @@ func (a *HTTPArchive) Install(dst string) (string, error) {
 	if err != nil {
 		return installed, err
 	}
-	data, _, err := httputil.ReadRemoteFile(source, "")
+	data, _, err := readRemoteFile(source)
 	if err != nil {
 		return installed, err
 	}
@@ -87,9 +89,13 @@ func (a *HTTPArchive) Install(dst string) (string, error) {
 		return installed, err
 	}
 
-	return installed, extract.Archive(context.Background(), br, versioned, func(s string) string {
+	if err = extract.Archive(context.Background(), br, versioned, func(s string) string {
 		return strings.TrimPrefix(s, prefix)
-	})
+	}); err != nil {
+		return installed, err
+	}
+
+	return installed, ensureBin(versioned)
 }
 
 func (a *HTTPArchive) checksum(data []byte) error {
@@ -132,5 +138,65 @@ func (a *HTTPArchive) expand(name, text string) (string, error) {
 }
 
 func (n *HTTPArchive) Runtime() Installable {
+	return nil
+}
+
+func readRemoteFile(url string) ([]byte, http.Header, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, resp.Header, fmt.Errorf("unexpected status code while reading %s: %v", url, resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, resp.Header, err
+	}
+	defer resp.Body.Close()
+
+	return body, resp.Header, nil
+}
+
+func hasBinDir(dir string) (bool, error) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return false, err
+	}
+	for _, entry := range entries {
+		if entry.IsDir() && entry.Name() == "bin" {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func ensureBin(dir string) error {
+	hasBin, err := hasBinDir(dir)
+	if err != nil {
+		return err
+	}
+
+	if !hasBin {
+		_ = os.MkdirAll(path.Join(dir, "bin"), os.ModePerm)
+	}
+
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			_ = os.Rename(path.Join(dir, entry.Name()), path.Join(dir, "bin", entry.Name()))
+		}
+	}
+
 	return nil
 }

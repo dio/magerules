@@ -21,11 +21,12 @@ func StaticBuild(name, goos, goarch string) error {
 	}
 
 	env := map[string]string{
-		"GOOS":   goos,
-		"GOARCH": goarch,
+		"GOOS":        goos,
+		"GOARCH":      goarch,
+		"CGO_ENABLED": "0",
 	}
 	output := fmt.Sprintf("build/%s_%s_%s_%s/%s", x.Key(), repo.Version(), goos, goarch, x.Name())
-	return sh.RunWith(env, "go", "build", "-ldflags", ldflags, "-o", output, mod+"/"+x.Key())
+	return sh.RunWith(env, "go", "build", "-tags", "-netgo", "-ldflags", ldflags, "-extldflags", "-static", "-o", output, mod+"/"+x.Key())
 }
 
 func StaticLdflags(mod string) (string, error) {

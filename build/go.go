@@ -8,7 +8,7 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-func StaticBuild(name string, goos, goarch string) error {
+func StaticBuild(name, goos, goarch string) error {
 	x := target.Name(name)
 	mod, err := repo.GoMod()
 	if err != nil {

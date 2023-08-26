@@ -24,7 +24,6 @@ func Load(dir string) (*Tools, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	if !path.IsAbs(dir) {
 		topLevel, _ := repo.ShowToplevel()
 		dir = path.Join(topLevel, dir)

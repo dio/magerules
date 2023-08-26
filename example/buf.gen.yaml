@@ -1,0 +1,18 @@
+version: v1
+managed:
+  enabled: true
+  go_package_prefix:
+    default: github.com/dio/magerules/example/api
+plugins:
+  - name: go
+    out: api
+    opt: paths=source_relative
+  - name: connect-go
+    out: api
+    opt: paths=source_relative
+  - name: es
+    out: ui/api
+    opt: target=ts
+  - name: connect-es
+    out: ui/api
+    opt: target=ts

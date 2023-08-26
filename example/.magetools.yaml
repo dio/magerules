@@ -1,0 +1,40 @@
+tools:
+  - name: protoc-gen-es
+    type: npm:binary
+    version: v1.3.0
+    source: "@bufbuild/protoc-gen-es"
+    option:
+      # "runtime" selects a tool inside tools to be installed first. Since *this* tools needs the specified runtime to be executed.
+      # As an alternative, in the code, one can use tools.RunWith(RuntimeWithOption{deps: ["node"]}) too.
+      runtime: node
+  - name: protoc-gen-connect-es
+    type: npm:binary
+    version: v0.13.0
+    source: "@bufbuild/protoc-gen-connect-es"
+    option:
+      runtime: node
+  - name: protoc-gen-go
+    type: go:binary
+    version: v1.31.0
+    source: "google.golang.org/protobuf/cmd/protoc-gen-go"
+  - name: protoc-gen-connect-go
+    type: go:binary
+    version: v1.11.0
+    source: "connectrpc.com/connect/cmd/protoc-gen-connect-go"
+  - name: buf
+    type: go:binary
+    version: v1.26.1
+    source: "github.com/bufbuild/buf/cmd/buf"
+  - name: node
+    version: v18.17.1
+    type: http:archive
+    source: https://nodejs.org/dist/{{ .Version }}/node-{{ .Version }}-{{ .OS }}-{{ .Arch }}{{ .Ext }}
+    option:
+      ci: skip # Skip installing this on CI=true env.
+      stripPrefix: "node-{{ .Version }}-{{ .OS }}-{{ .Arch }}"
+      shas:
+        darwin-arm64: sha256:18ca716ea57522b90473777cb9f878467f77fdf826d37beb15a0889fdd74533e
+        darwin-amd64: sha256:b3e083d2715f07ec3f00438401fb58faa1e0bdf3c7bde9f38b75ed17809d92fa
+      overrides:
+        arch:
+          amd64: x64

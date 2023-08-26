@@ -24,11 +24,12 @@ func Version() string {
 }
 
 func GoMod() (string, error) {
-	list, err := sh.Output("go", "list", "-m")
+	list, err := sh.Output("go", "mod", "edit", "-print")
 	if err != nil {
 		return "", err
 	}
 	// The "list" contains multiple modules separated by "\n". We are interested in the first entry.
 	mods := strings.SplitN(list, "\n", 2)
-	return mods[0], nil
+	mod := strings.SplitN(mods[0], " ", 2)
+	return mod[1], nil
 }

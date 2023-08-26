@@ -18,7 +18,7 @@ import (
 func Build(targets string) error {
 	names := strings.Split(targets, ",")
 	for _, name := range names {
-		if err := build.StaticBuild(name, runtime.GOOS, runtime.GOARCH); err != nil {
+		if err := build.StaticBuild(name, runtime.GOOS, runtime.GOARCH, "pkg/version"); err != nil {
 			return err
 		}
 	}
@@ -29,7 +29,7 @@ func Dist(targets string) error {
 	names := strings.Split(targets, ",")
 	for _, name := range names {
 		name := name
-		if err := dist.Create(name, build.StaticBuild); err != nil {
+		if err := dist.Create(name, "pkg/version", build.StaticBuild); err != nil {
 			return err
 		}
 	}

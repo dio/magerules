@@ -6,6 +6,8 @@ import (
 	"github.com/dio/magerules/example/pkg/version"
 )
 
+var commit string
+
 func main() {
-	fmt.Println("foo", version.Commit, version.Version)
+	fmt.Println("haha", version.Commit, version.Version, commit)
 }

@@ -25,6 +25,10 @@ tools:
     type: go:binary
     version: v1.26.1
     source: "github.com/bufbuild/buf/cmd/buf"
+  - name: ko
+    type: go:binary
+    version: v0.14.1
+    source: "github.com/google/ko"
   - name: node
     version: v18.17.1
     type: http:archive
